@@ -36,10 +36,15 @@ Safety Report: The final analysis card featuring the large safety score and stat
 <img width="1873" height="896" alt="scrnsht 3" src="https://github.com/user-attachments/assets/0eaaae5f-ed78-49f2-b719-8ddfc27d4dc8" />
 
 
-🎥 Demo Video Link
+## 🎥 Demo Video Link
+
+
+https://github.com/user-attachments/assets/a9b250fd-3165-405b-9efc-fd8261c2afb9
 
 
 
+## 📐 Architecture Diagram
+<img width="1024" height="1024" alt="workflow" src="https://github.com/user-attachments/assets/6b811957-0ca4-4fc2-aa84-22557ee7e2a1" />
 
 
 ## 🛠️ Installation Commands
