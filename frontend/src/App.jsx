@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Search, MapPin, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { Search, Navigation2, ShieldCheck, ShieldAlert, Loader2, Info, ChevronDown } from 'lucide-react';
 
 const API_BASE = "http://localhost:8000";
 
@@ -10,7 +10,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [time, setTime] = useState("Night (9PM - 12AM)");
 
-  // Live search for suggestions
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (query.length > 2) {
@@ -18,7 +17,7 @@ export default function App() {
           const res = await fetch(`${API_BASE}/suggestions?query=${query}`);
           const data = await res.json();
           setSuggestions(data);
-        } catch (err) { console.error("Search error:", err); }
+        } catch (err) { console.error(err); }
       } else { setSuggestions([]); }
     }, 300);
     return () => clearTimeout(delayDebounceFn);
@@ -31,104 +30,127 @@ export default function App() {
       const res = await fetch(`${API_BASE}/analyze?place_id=${placeId}&time=${time}`);
       const data = await res.json();
       setResult(data);
-    } catch (err) { console.error("Analysis error:", err); }
+    } catch (err) { console.error(err); }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-12 font-sans">
-      <div className="max-w-2xl mx-auto">
-        <header className="mb-12 text-center">
-          <div className="inline-block p-3 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-200">
-            <ShieldCheck size={32} className="text-white" />
-          </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">SafetyWise AI</h1>
-          <p className="text-slate-500 mt-2 font-medium">Real-time night safety intelligence</p>
-        </header>
+    <div className="min-h-screen bg-white text-[#1a1a1a] font-sans flex flex-col items-center px-6 py-24">
+      
+      {/* Branding */}
+      <header className="flex flex-col items-center mb-20">
+        <div className="mb-8 p-5 bg-slate-900 rounded-[2.5rem] text-white shadow-2xl">
+          <ShieldCheck size={48} strokeWidth={1.2} />
+        </div>
+        <h1 className="text-7xl font-[900] tracking-tighter italic uppercase leading-none">
+          SAFETY<span className="text-slate-300">WISE</span>
+        </h1>
+      </header>
 
-        {/* Search & Time Selection */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 mb-10 border border-slate-100 relative">
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-4 text-slate-300" size={20} />
-              <input 
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-400 outline-none transition-all"
-                placeholder="Where are you heading?"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
+      <div className="w-full max-w-lg space-y-6">
+        {/* REDUCED SIZE DROPDOWN */}
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">Select Timeframe</span>
+          <div className="relative inline-block group">
             <select 
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="bg-slate-50 border-none rounded-2xl px-4 py-4 text-sm font-bold text-slate-600 focus:ring-2 focus:ring-blue-400 outline-none cursor-pointer"
+              className="appearance-none bg-transparent pr-8 pl-2 py-1 text-lg font-black tracking-tight text-slate-900 outline-none cursor-pointer border-b border-slate-100 focus:border-slate-900 transition-colors"
             >
               <option>Evening (5PM - 9PM)</option>
               <option>Night (9PM - 12AM)</option>
               <option>After Midnight (12AM - 5AM)</option>
-              <option>Early Morning (5AM - 9AM)</option>
             </select>
+            <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" size={16} />
+          </div>
+        </div>
+
+        {/* DESTINATION SEARCH */}
+        <div className="relative group pt-4">
+          <div className="relative flex items-center bg-white border-2 border-slate-100 rounded-[2.5rem] px-8 py-3 transition-all duration-300 group-focus-within:border-slate-900 group-focus-within:shadow-2xl">
+            <Search className="text-slate-300 mr-4" size={24} />
+            <input 
+              className="flex-1 bg-transparent py-5 outline-none text-xl font-bold placeholder:text-slate-200"
+              placeholder="Enter destination"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
 
-          {/* Autocomplete Suggestions */}
           {suggestions.length > 0 && (
-            <div className="absolute left-6 right-6 top-24 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 overflow-hidden ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2">
+            <div className="absolute left-0 right-0 top-full mt-4 bg-white shadow-[0_40px_80px_rgba(0,0,0,0.15)] rounded-[2.5rem] border border-slate-50 overflow-hidden z-50">
               {suggestions.map((s) => (
                 <button 
                   key={s.place_id}
                   onClick={() => { setQuery(s.description); analyzeSafety(s.place_id); }}
-                  className="w-full text-left p-5 hover:bg-blue-50 border-b last:border-0 text-sm font-semibold flex items-center gap-3 transition-colors text-slate-700"
+                  className="w-full text-left p-6 hover:bg-slate-50 transition-colors text-sm font-bold flex items-center gap-4 text-slate-600 border-b last:border-0 border-slate-50"
                 >
-                  <MapPin size={16} className="text-blue-500" /> {s.description}
+                  <Navigation2 size={16} className="rotate-45 text-slate-400" />
+                  {s.description}
                 </button>
               ))}
             </div>
           )}
         </div>
-
-        {/* Loading & Results */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center p-12 text-blue-600 gap-4">
-            <Loader2 className="animate-spin" size={48} />
-            <span className="font-bold tracking-wide animate-pulse uppercase text-xs">Processing Safety Metrics...</span>
-          </div>
-        )}
-        
-        {result && !loading && (
-          <div className="bg-white rounded-[2.5rem] shadow-2xl p-10 border border-slate-100 animate-in fade-in zoom-in duration-500">
-            <div className="flex justify-between items-center mb-10">
-              <div className="flex items-center gap-5">
-                <div className={`p-5 rounded-3xl ${result.level === 'Safe' ? 'bg-green-500' : result.level === 'Moderate' ? 'bg-amber-500' : 'bg-red-500'} text-white shadow-lg`}>
-                  <ShieldCheck size={32} />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-black text-slate-900">{result.level}</h2>
-                  <p className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black">Area Assessment</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-5xl font-black text-slate-800 leading-none">{Math.round(result.score)}</div>
-                <div className="text-slate-300 text-[10px] font-black mt-2 uppercase tracking-widest">Safety Index</div>
-              </div>
-            </div>
-
-            <div className="w-full bg-slate-100 h-4 rounded-full mb-10 overflow-hidden shadow-inner">
-              <div 
-                className={`h-full transition-all duration-1000 ease-out rounded-full ${result.level === 'Safe' ? 'bg-green-500' : result.level === 'Moderate' ? 'bg-amber-500' : 'bg-red-500'}`}
-                style={{ width: `${result.score}%` }}
-              />
-            </div>
-
-            <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 relative overflow-hidden">
-               <div className={`absolute top-0 left-0 w-2 h-full ${result.level === 'Safe' ? 'bg-green-500' : 'bg-amber-500'}`}></div>
-              <h3 className="text-[10px] font-black text-slate-400 mb-4 flex items-center gap-2 tracking-[0.2em] uppercase">
-                <AlertCircle size={14} /> Safety Insights
-              </h3>
-              <p className="text-slate-600 leading-relaxed font-semibold italic text-lg">"{result.reasoning}"</p>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* LOADER */}
+      {loading && (
+        <div className="mt-20 flex flex-col items-center">
+          <Loader2 className="animate-spin text-slate-900 mb-4" size={32} />
+          <p className="text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">Analyzing Environment</p>
+        </div>
+      )}
+
+      {/* RESULT CARD - ADDED LEVEL BAR */}
+      {result && !loading && (
+        <div className="mt-16 w-full max-w-xl bg-slate-900 text-white rounded-[4rem] p-12 shadow-2xl animate-in zoom-in-95 duration-500 relative overflow-hidden">
+           <div className="relative z-10">
+             <div className="flex justify-between items-center mb-8">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-4 block">Security Index</span>
+                  <h2 className="text-9xl font-black tracking-tighter leading-none">{Math.round(result.score)}</h2>
+                </div>
+                
+                <div className="flex flex-col items-center gap-4">
+                  {result.level === 'Safe' ? (
+                    <ShieldCheck size={72} strokeWidth={1.2} className="text-green-500" />
+                  ) : (
+                    <ShieldAlert size={72} strokeWidth={1.2} className={result.level === 'Risky' ? 'text-red-600' : 'text-amber-400'} />
+                  )}
+                  
+                  <div className={`px-10 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg ${
+                    result.level === 'Safe' ? 'bg-green-500 text-white' : 
+                    result.level === 'Moderate' ? 'bg-amber-400 text-slate-900' : 
+                    'bg-red-600 text-white'
+                  }`}>
+                    {result.level}
+                  </div>
+                </div>
+             </div>
+
+             {/* LEVEL BAR INDICATOR */}
+             <div className="w-full bg-white/10 h-3 rounded-full mb-12 overflow-hidden shadow-inner">
+               <div 
+                 className={`h-full transition-all duration-1000 ease-out rounded-full ${
+                   result.level === 'Safe' ? 'bg-green-500' : 
+                   result.level === 'Moderate' ? 'bg-amber-400' : 'bg-red-600'
+                 }`}
+                 style={{ width: `${result.score}%` }}
+               />
+             </div>
+             
+             <div className="pt-10 border-t border-white/10">
+               <h3 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 mb-6">
+                 <Info size={14} /> Intelligence Reasoning
+               </h3>
+               <p className="text-2xl font-medium leading-relaxed text-slate-300 italic">
+                 "{result.reasoning}"
+               </p>
+             </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 }
